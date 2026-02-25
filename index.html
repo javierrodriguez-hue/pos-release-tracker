@@ -22,84 +22,39 @@
 
   .container { max-width: 1100px; margin: 32px auto; padding: 0 20px; }
 
-  .top-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-  }
+  .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
   .top-bar h2 { font-size: 1rem; color: #555; font-weight: 500; }
 
   .btn {
-    background: #2563eb;
-    color: white;
-    border: none;
-    padding: 9px 18px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: background 0.2s;
+    background: #2563eb; color: white; border: none;
+    padding: 9px 18px; border-radius: 6px; cursor: pointer;
+    font-size: 0.9rem; font-weight: 500; transition: background 0.2s;
   }
   .btn:hover { background: #1d4ed8; }
   .btn.secondary { background: #e2e8f0; color: #1a1a2e; }
   .btn.secondary:hover { background: #cbd5e1; }
-  .btn.danger { background: #dc2626; }
-  .btn.danger:hover { background: #b91c1c; }
 
-  /* Modal */
-  .modal-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,0.5);
-    z-index: 100;
-    align-items: center;
-    justify-content: center;
+  /* Summary */
+  .summary-bar { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+  .summary-pill {
+    background: white; border-radius: 8px; padding: 10px 18px;
+    font-size: 0.85rem; box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    display: flex; align-items: center; gap: 8px;
   }
-  .modal-overlay.active { display: flex; }
-  .modal {
-    background: white;
-    border-radius: 10px;
-    padding: 28px;
-    width: 480px;
-    max-width: 95vw;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  }
-  .modal h3 { font-size: 1.1rem; margin-bottom: 20px; color: #1a1a2e; }
-  .field { margin-bottom: 16px; }
-  .field label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #444; }
-  .field input {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    outline: none;
-    transition: border 0.2s;
-  }
-  .field input:focus { border-color: #2563eb; }
-  .field select {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 0.9rem;
-    outline: none;
-    background: white;
-  }
-  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+  .summary-pill .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.green { background: #16a34a; }
+  .dot.amber { background: #d97706; }
+  .dot.red { background: #dc2626; }
+  .dot.gray { background: #6b7280; }
 
-  /* Cards */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+  /* Grid */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px; }
 
   .card {
-    background: white;
-    border-radius: 10px;
-    padding: 22px;
+    background: white; border-radius: 10px; padding: 22px;
     box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     border-left: 4px solid #e2e8f0;
     transition: box-shadow 0.2s;
-    position: relative;
   }
   .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
   .card.up-to-date { border-left-color: #16a34a; }
@@ -107,88 +62,109 @@
   .card.critical { border-left-color: #dc2626; }
   .card.unknown { border-left-color: #6b7280; }
 
-  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
   .card-name { font-size: 1.05rem; font-weight: 700; color: #1a1a2e; }
 
   .badge {
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 3px 10px;
-    border-radius: 20px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    font-size: 0.72rem; font-weight: 700; padding: 3px 10px;
+    border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+    border: none; font-family: inherit;
   }
   .badge.up-to-date { background: #dcfce7; color: #15803d; }
   .badge.update-available { background: #fef3c7; color: #b45309; }
   .badge.critical { background: #fee2e2; color: #b91c1c; }
   .badge.unknown { background: #f1f5f9; color: #64748b; }
 
-  .card-meta { font-size: 0.83rem; color: #64748b; line-height: 1.9; }
-  .card-meta strong { color: #334155; }
-
-  .card-actions { display: flex; gap: 8px; margin-top: 16px; align-items: center; }
-  .card-actions a {
-    font-size: 0.82rem;
-    color: #2563eb;
-    text-decoration: none;
-    font-weight: 500;
+  /* Status dropdown */
+  .status-select {
+    font-size: 0.72rem; font-weight: 700; padding: 3px 10px;
+    border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px;
+    border: 2px solid #2563eb; background: white; cursor: pointer;
+    font-family: inherit; outline: none;
   }
-  .card-actions a:hover { text-decoration: underline; }
 
-  .refresh-btn {
-    background: none;
-    border: 1px solid #e2e8f0;
-    border-radius: 5px;
-    padding: 4px 10px;
-    font-size: 0.78rem;
-    cursor: pointer;
-    color: #555;
+  /* Inline fields */
+  .fields { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+
+  .field-row { display: flex; flex-direction: column; gap: 3px; }
+  .field-label {
+    font-size: 0.75rem; font-weight: 700; color: #64748b;
+    text-transform: uppercase; letter-spacing: 0.5px;
+  }
+  .field-display {
+    font-size: 0.88rem; color: #334155; min-height: 24px;
+    padding: 4px 6px; border-radius: 5px; cursor: pointer;
+    border: 1px solid transparent; transition: border 0.15s, background 0.15s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .field-display:hover { border-color: #cbd5e1; background: #f8fafc; }
+  .field-display.empty { color: #94a3b8; font-style: italic; }
+  .field-display a { color: #2563eb; text-decoration: none; font-size: 0.88rem; }
+  .field-display a:hover { text-decoration: underline; }
+  .edit-icon { font-size: 0.7rem; color: #94a3b8; flex-shrink: 0; }
+
+  .field-input {
+    font-size: 0.88rem; padding: 5px 8px; border: 1px solid #2563eb;
+    border-radius: 5px; outline: none; width: 100%; font-family: inherit;
+    color: #1a1a2e;
+  }
+  .field-input:focus { box-shadow: 0 0 0 2px #bfdbfe; }
+
+  .field-hint { font-size: 0.73rem; color: #94a3b8; margin-top: 1px; }
+
+  /* Card footer */
+  .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding-top: 12px; border-top: 1px solid #f1f5f9; }
+  .card-actions { display: flex; gap: 6px; }
+
+  .icon-btn {
+    background: none; border: 1px solid #e2e8f0; border-radius: 5px;
+    padding: 4px 10px; font-size: 0.78rem; cursor: pointer; color: #555;
     transition: background 0.15s;
   }
-  .refresh-btn:hover { background: #f1f5f9; }
+  .icon-btn:hover { background: #f1f5f9; }
+  .icon-btn.danger { color: #dc2626; }
+  .icon-btn.danger:hover { background: #fef2f2; border-color: #fecaca; }
 
-  .edit-btn, .del-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 0.78rem;
-    padding: 4px 8px;
-    border-radius: 4px;
+  .last-checked { font-size: 0.75rem; color: #94a3b8; }
+
+  /* Changelog link */
+  .changelog-link { font-size: 0.82rem; margin-bottom: 14px; }
+  .changelog-link a { color: #2563eb; text-decoration: none; font-weight: 500; }
+  .changelog-link a:hover { text-decoration: underline; }
+
+  /* Add/Edit Modal */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5); z-index: 100;
+    align-items: center; justify-content: center;
   }
-  .edit-btn { color: #2563eb; }
-  .edit-btn:hover { background: #eff6ff; }
-  .del-btn { color: #dc2626; }
-  .del-btn:hover { background: #fef2f2; }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: white; border-radius: 10px; padding: 28px;
+    width: 460px; max-width: 95vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .modal h3 { font-size: 1.1rem; margin-bottom: 20px; color: #1a1a2e; }
+  .mfield { margin-bottom: 16px; }
+  .mfield label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #444; }
+  .mfield input {
+    width: 100%; padding: 9px 12px; border: 1px solid #d1d5db;
+    border-radius: 6px; font-size: 0.9rem; outline: none; transition: border 0.2s;
+    font-family: inherit;
+  }
+  .mfield input:focus { border-color: #2563eb; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
 
-  .last-checked { font-size: 0.75rem; color: #94a3b8; margin-top: 10px; }
+  .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+  .empty-state p { margin-bottom: 16px; font-size: 1rem; }
 
-  .empty { text-align: center; padding: 60px 20px; color: #94a3b8; }
-  .empty p { margin-bottom: 16px; font-size: 1rem; }
-
-  .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #e2e8f0; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 4px; vertical-align: middle; }
+  .spinner {
+    display: inline-block; width: 12px; height: 12px;
+    border: 2px solid #e2e8f0; border-top-color: #2563eb;
+    border-radius: 50%; animation: spin 0.6s linear infinite;
+    margin-right: 4px; vertical-align: middle;
+  }
   @keyframes spin { to { transform: rotate(360deg); } }
-
-  .summary-bar {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-  }
-  .summary-pill {
-    background: white;
-    border-radius: 8px;
-    padding: 10px 18px;
-    font-size: 0.85rem;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .summary-pill .dot { width: 10px; height: 10px; border-radius: 50%; }
-  .dot.green { background: #16a34a; }
-  .dot.amber { background: #d97706; }
-  .dot.red { background: #dc2626; }
-  .dot.gray { background: #6b7280; }
 </style>
 </head>
 <body>
@@ -204,73 +180,58 @@
   <div class="top-bar">
     <h2 id="program-count">0 programs tracked</h2>
     <div style="display:flex;gap:10px;">
-      <button class="btn secondary" onclick="refreshAll()">↻ Refresh All</button>
+      <button class="btn secondary" onclick="refreshAll()">↻ Check All URLs</button>
       <button class="btn" onclick="openAddModal()">+ Add Program</button>
     </div>
   </div>
 
   <div class="grid" id="grid"></div>
-  <div class="empty" id="empty" style="display:none;">
+  <div class="empty-state" id="empty" style="display:none;">
     <p>No programs tracked yet.</p>
     <button class="btn" onclick="openAddModal()">+ Add your first program</button>
   </div>
 </div>
 
-<!-- Add/Edit Modal -->
+<!-- Add Modal -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <h3 id="modal-title">Add POS Program</h3>
-    <div class="field">
+    <div class="mfield">
       <label>Program Name</label>
       <input type="text" id="f-name" placeholder="e.g. Tekmetric">
     </div>
-    <div class="field">
+    <div class="mfield">
       <label>Changelog / Release Notes URL</label>
       <input type="url" id="f-url" placeholder="https://...">
     </div>
-    <div class="field">
-      <label>Current Version Installed (optional)</label>
-      <input type="text" id="f-installed" placeholder="e.g. 2.4.1">
-    </div>
-    <div class="field">
-      <label>Status Override</label>
-      <select id="f-status">
-        <option value="unknown">Unknown (auto-detect)</option>
-        <option value="up-to-date">Up to Date</option>
-        <option value="update-available">Update Available</option>
-        <option value="critical">Critical Update</option>
-      </select>
-    </div>
     <div class="modal-actions">
       <button class="btn secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn" onclick="saveProgram()">Save</button>
+      <button class="btn" onclick="saveProgram()">Add Program</button>
     </div>
   </div>
 </div>
 
 <script>
-const STORAGE_KEY = 'pos_tracker_v1';
+const STORAGE_KEY = 'pos_tracker_v2';
 let programs = [];
-let editingId = null;
+let activeInput = null; // tracks which field is being edited
 
-// Load from localStorage
 function load() {
   try {
     const d = localStorage.getItem(STORAGE_KEY);
     programs = d ? JSON.parse(d) : [];
   } catch { programs = []; }
-
-  // Seed with Tekmetric if empty
   if (programs.length === 0) {
     programs = [{
       id: Date.now(),
       name: 'Tekmetric',
       url: 'https://support.tekmetric.com/hc/en-us/articles/360041785434-Release-Date-Feature-Notes',
-      installed: '',
       status: 'unknown',
-      latestVersion: null,
-      releaseDate: null,
-      lastChecked: null
+      updateDate: '',
+      featureLink: '',
+      notes: '',
+      lastChecked: null,
+      loading: false
     }];
     save();
   }
@@ -280,25 +241,68 @@ function save() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(programs));
 }
 
-function openAddModal() {
-  editingId = null;
-  document.getElementById('modal-title').textContent = 'Add POS Program';
-  document.getElementById('f-name').value = '';
-  document.getElementById('f-url').value = '';
-  document.getElementById('f-installed').value = '';
-  document.getElementById('f-status').value = 'unknown';
-  document.getElementById('modal').classList.add('active');
-}
+// ── Inline field editing ──────────────────────────────────────────────
+function startEdit(id, field, el) {
+  // commit any open edit first
+  if (activeInput) commitEdit();
 
-function openEditModal(id) {
   const p = programs.find(x => x.id === id);
   if (!p) return;
-  editingId = id;
-  document.getElementById('modal-title').textContent = 'Edit Program';
-  document.getElementById('f-name').value = p.name;
-  document.getElementById('f-url').value = p.url;
-  document.getElementById('f-installed').value = p.installed || '';
-  document.getElementById('f-status').value = p.status;
+
+  const val = p[field] || '';
+  const isUrl = field === 'featureLink';
+
+  const input = document.createElement('input');
+  input.type = isUrl ? 'url' : 'text';
+  input.className = 'field-input';
+  input.value = val;
+  input.placeholder = isUrl ? 'https://...' : (field === 'updateDate' ? 'e.g. Feb 18, 2025' : 'Brief description...');
+
+  activeInput = { id, field, el, input };
+
+  el.replaceWith(input);
+  input.focus();
+  input.select();
+
+  input.addEventListener('blur', commitEdit);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); commitEdit(); }
+    if (e.key === 'Escape') { cancelEdit(); }
+  });
+}
+
+function commitEdit() {
+  if (!activeInput) return;
+  const { id, field, input } = activeInput;
+  const p = programs.find(x => x.id === id);
+  if (p) {
+    p[field] = input.value.trim();
+    save();
+  }
+  activeInput = null;
+  render();
+}
+
+function cancelEdit() {
+  activeInput = null;
+  render();
+}
+
+// ── Status cycling ────────────────────────────────────────────────────
+function cycleStatus(id) {
+  const p = programs.find(x => x.id === id);
+  if (!p) return;
+  const order = ['unknown', 'up-to-date', 'update-available', 'critical'];
+  const idx = order.indexOf(p.status || 'unknown');
+  p.status = order[(idx + 1) % order.length];
+  save();
+  render();
+}
+
+// ── Add modal ─────────────────────────────────────────────────────────
+function openAddModal() {
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-url').value = '';
   document.getElementById('modal').classList.add('active');
 }
 
@@ -309,16 +313,12 @@ function closeModal() {
 function saveProgram() {
   const name = document.getElementById('f-name').value.trim();
   const url = document.getElementById('f-url').value.trim();
-  const installed = document.getElementById('f-installed').value.trim();
-  const status = document.getElementById('f-status').value;
   if (!name || !url) { alert('Please enter a name and URL.'); return; }
-
-  if (editingId) {
-    const p = programs.find(x => x.id === editingId);
-    Object.assign(p, { name, url, installed, status });
-  } else {
-    programs.push({ id: Date.now(), name, url, installed, status, latestVersion: null, releaseDate: null, lastChecked: null });
-  }
+  programs.push({
+    id: Date.now(), name, url, status: 'unknown',
+    updateDate: '', featureLink: '', notes: '',
+    lastChecked: null, loading: false
+  });
   save();
   closeModal();
   render();
@@ -331,102 +331,123 @@ function deleteProgram(id) {
   render();
 }
 
-// Attempt to fetch page title/date as a lightweight "version check"
-// Since we can't scrape arbitrary sites due to CORS, we do a CORS-friendly fetch attempt
-// and show the user the link + last-checked timestamp.
+// ── URL reachability check ────────────────────────────────────────────
 async function fetchInfo(p) {
   p.lastChecked = new Date().toISOString();
-  // We attempt a no-cors fetch just to confirm the URL is reachable
   try {
     await fetch(p.url, { method: 'HEAD', mode: 'no-cors' });
     p.reachable = true;
-  } catch {
-    p.reachable = false;
-  }
+  } catch { p.reachable = false; }
   save();
 }
 
 async function refreshOne(id) {
   const p = programs.find(x => x.id === id);
   if (!p) return;
-  p.loading = true;
-  render();
+  p.loading = true; render();
   await fetchInfo(p);
-  p.loading = false;
-  render();
+  p.loading = false; render();
 }
 
 async function refreshAll() {
-  for (const p of programs) { p.loading = true; }
-  render();
+  programs.forEach(p => p.loading = true); render();
   await Promise.all(programs.map(fetchInfo));
   programs.forEach(p => p.loading = false);
-  document.getElementById('last-refresh').textContent = 'Last refreshed: ' + new Date().toLocaleTimeString();
+  document.getElementById('last-refresh').textContent = 'Last checked: ' + new Date().toLocaleTimeString();
   render();
 }
 
-function statusClass(p) {
-  return p.status || 'unknown';
-}
-
+// ── Helpers ───────────────────────────────────────────────────────────
 function badgeLabel(s) {
   return { 'up-to-date': 'Up to Date', 'update-available': 'Update Available', 'critical': 'Critical', 'unknown': 'Unknown' }[s] || 'Unknown';
-}
-
-function render() {
-  const grid = document.getElementById('grid');
-  const empty = document.getElementById('empty');
-  const count = document.getElementById('program-count');
-  count.textContent = programs.length + ' program' + (programs.length !== 1 ? 's' : '') + ' tracked';
-
-  // Summary bar
-  const counts = { 'up-to-date': 0, 'update-available': 0, 'critical': 0, 'unknown': 0 };
-  programs.forEach(p => { counts[p.status || 'unknown']++; });
-  document.getElementById('summary-bar').innerHTML = `
-    <div class="summary-pill"><span class="dot green"></span> Up to Date: <strong>${counts['up-to-date']}</strong></div>
-    <div class="summary-pill"><span class="dot amber"></span> Update Available: <strong>${counts['update-available']}</strong></div>
-    <div class="summary-pill"><span class="dot red"></span> Critical: <strong>${counts['critical']}</strong></div>
-    <div class="summary-pill"><span class="dot gray"></span> Unknown: <strong>${counts['unknown']}</strong></div>
-  `;
-
-  if (programs.length === 0) {
-    grid.innerHTML = '';
-    empty.style.display = 'block';
-    return;
-  }
-  empty.style.display = 'none';
-
-  grid.innerHTML = programs.map(p => {
-    const sc = statusClass(p);
-    const checked = p.lastChecked ? new Date(p.lastChecked).toLocaleString() : 'Never';
-    return `
-    <div class="card ${sc}">
-      <div class="card-header">
-        <div class="card-name">${esc(p.name)}</div>
-        <span class="badge ${sc}">${badgeLabel(sc)}</span>
-      </div>
-      <div class="card-meta">
-        ${p.installed ? `<div><strong>Installed:</strong> ${esc(p.installed)}</div>` : ''}
-        ${p.latestVersion ? `<div><strong>Latest:</strong> ${esc(p.latestVersion)}</div>` : ''}
-        ${p.releaseDate ? `<div><strong>Released:</strong> ${esc(p.releaseDate)}</div>` : ''}
-        <div><strong>Changelog:</strong> <a href="${esc(p.url)}" target="_blank" rel="noopener">View release notes ↗</a></div>
-      </div>
-      <div class="card-actions">
-        ${p.loading ? `<span><span class="spinner"></span> Checking...</span>` : `<button class="refresh-btn" onclick="refreshOne(${p.id})">↻ Check Now</button>`}
-        <button class="edit-btn" onclick="openEditModal(${p.id})">✏ Edit</button>
-        <button class="del-btn" onclick="deleteProgram(${p.id})">✕ Remove</button>
-      </div>
-      <div class="last-checked">Last checked: ${checked}</div>
-    </div>`;
-  }).join('');
 }
 
 function esc(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// Close modal on overlay click
-document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+// ── Render ────────────────────────────────────────────────────────────
+function render() {
+  const grid = document.getElementById('grid');
+  const empty = document.getElementById('empty');
+  document.getElementById('program-count').textContent =
+    programs.length + ' program' + (programs.length !== 1 ? 's' : '') + ' tracked';
+
+  // Summary
+  const counts = { 'up-to-date': 0, 'update-available': 0, 'critical': 0, 'unknown': 0 };
+  programs.forEach(p => counts[p.status || 'unknown']++);
+  document.getElementById('summary-bar').innerHTML = `
+    <div class="summary-pill"><span class="dot green"></span> Up to Date: <strong>${counts['up-to-date']}</strong></div>
+    <div class="summary-pill"><span class="dot amber"></span> Update Available: <strong>${counts['update-available']}</strong></div>
+    <div class="summary-pill"><span class="dot red"></span> Critical: <strong>${counts['critical']}</strong></div>
+    <div class="summary-pill"><span class="dot gray"></span> Unknown: <strong>${counts['unknown']}</strong></div>`;
+
+  if (programs.length === 0) {
+    grid.innerHTML = ''; empty.style.display = 'block'; return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = programs.map(p => {
+    const sc = p.status || 'unknown';
+    const checked = p.lastChecked ? new Date(p.lastChecked).toLocaleString() : 'Never';
+
+    const dateDisplay = p.updateDate
+      ? `<span>${esc(p.updateDate)}</span><span class="edit-icon">✎</span>`
+      : `<span class="empty">Click to add date</span><span class="edit-icon">✎</span>`;
+
+    const linkDisplay = p.featureLink
+      ? `<a href="${esc(p.featureLink)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">View feature ↗</a><span class="edit-icon">✎</span>`
+      : `<span class="empty">Click to add feature link</span><span class="edit-icon">✎</span>`;
+
+    const notesDisplay = p.notes
+      ? `<span>${esc(p.notes)}</span><span class="edit-icon">✎</span>`
+      : `<span class="empty">Click to add notes</span><span class="edit-icon">✎</span>`;
+
+    return `
+    <div class="card ${sc}">
+      <div class="card-header">
+        <div class="card-name">${esc(p.name)}</div>
+        <button class="badge ${sc}" onclick="cycleStatus(${p.id})" title="Click to change status">${badgeLabel(sc)}</button>
+      </div>
+
+      <div class="changelog-link">
+        🔗 <a href="${esc(p.url)}" target="_blank" rel="noopener">Changelog / Release Notes ↗</a>
+      </div>
+
+      <div class="fields">
+        <div class="field-row">
+          <div class="field-label">Most Recent Update Date</div>
+          <div class="field-display ${p.updateDate ? '' : 'empty'}"
+               onclick="startEdit(${p.id}, 'updateDate', this)">${dateDisplay}</div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Feature Link</div>
+          <div class="field-display ${p.featureLink ? '' : 'empty'}"
+               onclick="startEdit(${p.id}, 'featureLink', this)">${linkDisplay}</div>
+        </div>
+        <div class="field-row">
+          <div class="field-label">Notes</div>
+          <div class="field-display ${p.notes ? '' : 'empty'}"
+               onclick="startEdit(${p.id}, 'notes', this)">${notesDisplay}</div>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <div class="card-actions">
+          ${p.loading
+            ? `<span><span class="spinner"></span> Checking...</span>`
+            : `<button class="icon-btn" onclick="refreshOne(${p.id})">↻ Check URL</button>`}
+          <button class="icon-btn danger" onclick="deleteProgram(${p.id})">✕ Remove</button>
+        </div>
+        <div class="last-checked">Checked: ${checked}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeModal();
+});
 
 load();
 render();
