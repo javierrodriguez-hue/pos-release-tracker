@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>POS Release Tracker</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f2f5; color: #1a1a2e; }
+
+  header {
+    background: #1a1a2e;
+    color: white;
+    padding: 18px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  header h1 { font-size: 1.3rem; font-weight: 600; letter-spacing: 0.5px; }
+  header span { font-size: 0.8rem; color: #8892b0; }
+
+  .container { max-width: 1100px; margin: 32px auto; padding: 0 20px; }
+
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .top-bar h2 { font-size: 1rem; color: #555; font-weight: 500; }
+
+  .btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background 0.2s;
+  }
+  .btn:hover { background: #1d4ed8; }
+  .btn.secondary { background: #e2e8f0; color: #1a1a2e; }
+  .btn.secondary:hover { background: #cbd5e1; }
+  .btn.danger { background: #dc2626; }
+  .btn.danger:hover { background: #b91c1c; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: white;
+    border-radius: 10px;
+    padding: 28px;
+    width: 480px;
+    max-width: 95vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  .modal h3 { font-size: 1.1rem; margin-bottom: 20px; color: #1a1a2e; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 6px; color: #444; }
+  .field input {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border 0.2s;
+  }
+  .field input:focus { border-color: #2563eb; }
+  .field select {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    outline: none;
+    background: white;
+  }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
+
+  /* Cards */
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+
+  .card {
+    background: white;
+    border-radius: 10px;
+    padding: 22px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    border-left: 4px solid #e2e8f0;
+    transition: box-shadow 0.2s;
+    position: relative;
+  }
+  .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.12); }
+  .card.up-to-date { border-left-color: #16a34a; }
+  .card.update-available { border-left-color: #d97706; }
+  .card.critical { border-left-color: #dc2626; }
+  .card.unknown { border-left-color: #6b7280; }
+
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+  .card-name { font-size: 1.05rem; font-weight: 700; color: #1a1a2e; }
+
+  .badge {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .badge.up-to-date { background: #dcfce7; color: #15803d; }
+  .badge.update-available { background: #fef3c7; color: #b45309; }
+  .badge.critical { background: #fee2e2; color: #b91c1c; }
+  .badge.unknown { background: #f1f5f9; color: #64748b; }
+
+  .card-meta { font-size: 0.83rem; color: #64748b; line-height: 1.9; }
+  .card-meta strong { color: #334155; }
+
+  .card-actions { display: flex; gap: 8px; margin-top: 16px; align-items: center; }
+  .card-actions a {
+    font-size: 0.82rem;
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .card-actions a:hover { text-decoration: underline; }
+
+  .refresh-btn {
+    background: none;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    padding: 4px 10px;
+    font-size: 0.78rem;
+    cursor: pointer;
+    color: #555;
+    transition: background 0.15s;
+  }
+  .refresh-btn:hover { background: #f1f5f9; }
+
+  .edit-btn, .del-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.78rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+  }
+  .edit-btn { color: #2563eb; }
+  .edit-btn:hover { background: #eff6ff; }
+  .del-btn { color: #dc2626; }
+  .del-btn:hover { background: #fef2f2; }
+
+  .last-checked { font-size: 0.75rem; color: #94a3b8; margin-top: 10px; }
+
+  .empty { text-align: center; padding: 60px 20px; color: #94a3b8; }
+  .empty p { margin-bottom: 16px; font-size: 1rem; }
+
+  .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #e2e8f0; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 4px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .summary-bar {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+  .summary-pill {
+    background: white;
+    border-radius: 8px;
+    padding: 10px 18px;
+    font-size: 0.85rem;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .summary-pill .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot.green { background: #16a34a; }
+  .dot.amber { background: #d97706; }
+  .dot.red { background: #dc2626; }
+  .dot.gray { background: #6b7280; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🖥️ POS Release Tracker</h1>
+  <span id="last-refresh">Never refreshed</span>
+</header>
+
+<div class="container">
+  <div class="summary-bar" id="summary-bar"></div>
+
+  <div class="top-bar">
+    <h2 id="program-count">0 programs tracked</h2>
+    <div style="display:flex;gap:10px;">
+      <button class="btn secondary" onclick="refreshAll()">↻ Refresh All</button>
+      <button class="btn" onclick="openAddModal()">+ Add Program</button>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div class="empty" id="empty" style="display:none;">
+    <p>No programs tracked yet.</p>
+    <button class="btn" onclick="openAddModal()">+ Add your first program</button>
+  </div>
+</div>
+
+<!-- Add/Edit Modal -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h3 id="modal-title">Add POS Program</h3>
+    <div class="field">
+      <label>Program Name</label>
+      <input type="text" id="f-name" placeholder="e.g. Tekmetric">
+    </div>
+    <div class="field">
+      <label>Changelog / Release Notes URL</label>
+      <input type="url" id="f-url" placeholder="https://...">
+    </div>
+    <div class="field">
+      <label>Current Version Installed (optional)</label>
+      <input type="text" id="f-installed" placeholder="e.g. 2.4.1">
+    </div>
+    <div class="field">
+      <label>Status Override</label>
+      <select id="f-status">
+        <option value="unknown">Unknown (auto-detect)</option>
+        <option value="up-to-date">Up to Date</option>
+        <option value="update-available">Update Available</option>
+        <option value="critical">Critical Update</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn" onclick="saveProgram()">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'pos_tracker_v1';
+let programs = [];
+let editingId = null;
+
+// Load from localStorage
+function load() {
+  try {
+    const d = localStorage.getItem(STORAGE_KEY);
+    programs = d ? JSON.parse(d) : [];
+  } catch { programs = []; }
+
+  // Seed with Tekmetric if empty
+  if (programs.length === 0) {
+    programs = [{
+      id: Date.now(),
+      name: 'Tekmetric',
+      url: 'https://support.tekmetric.com/hc/en-us/articles/360041785434-Release-Date-Feature-Notes',
+      installed: '',
+      status: 'unknown',
+      latestVersion: null,
+      releaseDate: null,
+      lastChecked: null
+    }];
+    save();
+  }
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(programs));
+}
+
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modal-title').textContent = 'Add POS Program';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-url').value = '';
+  document.getElementById('f-installed').value = '';
+  document.getElementById('f-status').value = 'unknown';
+  document.getElementById('modal').classList.add('active');
+}
+
+function openEditModal(id) {
+  const p = programs.find(x => x.id === id);
+  if (!p) return;
+  editingId = id;
+  document.getElementById('modal-title').textContent = 'Edit Program';
+  document.getElementById('f-name').value = p.name;
+  document.getElementById('f-url').value = p.url;
+  document.getElementById('f-installed').value = p.installed || '';
+  document.getElementById('f-status').value = p.status;
+  document.getElementById('modal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('active');
+}
+
+function saveProgram() {
+  const name = document.getElementById('f-name').value.trim();
+  const url = document.getElementById('f-url').value.trim();
+  const installed = document.getElementById('f-installed').value.trim();
+  const status = document.getElementById('f-status').value;
+  if (!name || !url) { alert('Please enter a name and URL.'); return; }
+
+  if (editingId) {
+    const p = programs.find(x => x.id === editingId);
+    Object.assign(p, { name, url, installed, status });
+  } else {
+    programs.push({ id: Date.now(), name, url, installed, status, latestVersion: null, releaseDate: null, lastChecked: null });
+  }
+  save();
+  closeModal();
+  render();
+}
+
+function deleteProgram(id) {
+  if (!confirm('Remove this program from tracking?')) return;
+  programs = programs.filter(x => x.id !== id);
+  save();
+  render();
+}
+
+// Attempt to fetch page title/date as a lightweight "version check"
+// Since we can't scrape arbitrary sites due to CORS, we do a CORS-friendly fetch attempt
+// and show the user the link + last-checked timestamp.
+async function fetchInfo(p) {
+  p.lastChecked = new Date().toISOString();
+  // We attempt a no-cors fetch just to confirm the URL is reachable
+  try {
+    await fetch(p.url, { method: 'HEAD', mode: 'no-cors' });
+    p.reachable = true;
+  } catch {
+    p.reachable = false;
+  }
+  save();
+}
+
+async function refreshOne(id) {
+  const p = programs.find(x => x.id === id);
+  if (!p) return;
+  p.loading = true;
+  render();
+  await fetchInfo(p);
+  p.loading = false;
+  render();
+}
+
+async function refreshAll() {
+  for (const p of programs) { p.loading = true; }
+  render();
+  await Promise.all(programs.map(fetchInfo));
+  programs.forEach(p => p.loading = false);
+  document.getElementById('last-refresh').textContent = 'Last refreshed: ' + new Date().toLocaleTimeString();
+  render();
+}
+
+function statusClass(p) {
+  return p.status || 'unknown';
+}
+
+function badgeLabel(s) {
+  return { 'up-to-date': 'Up to Date', 'update-available': 'Update Available', 'critical': 'Critical', 'unknown': 'Unknown' }[s] || 'Unknown';
+}
+
+function render() {
+  const grid = document.getElementById('grid');
+  const empty = document.getElementById('empty');
+  const count = document.getElementById('program-count');
+  count.textContent = programs.length + ' program' + (programs.length !== 1 ? 's' : '') + ' tracked';
+
+  // Summary bar
+  const counts = { 'up-to-date': 0, 'update-available': 0, 'critical': 0, 'unknown': 0 };
+  programs.forEach(p => { counts[p.status || 'unknown']++; });
+  document.getElementById('summary-bar').innerHTML = `
+    <div class="summary-pill"><span class="dot green"></span> Up to Date: <strong>${counts['up-to-date']}</strong></div>
+    <div class="summary-pill"><span class="dot amber"></span> Update Available: <strong>${counts['update-available']}</strong></div>
+    <div class="summary-pill"><span class="dot red"></span> Critical: <strong>${counts['critical']}</strong></div>
+    <div class="summary-pill"><span class="dot gray"></span> Unknown: <strong>${counts['unknown']}</strong></div>
+  `;
+
+  if (programs.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  grid.innerHTML = programs.map(p => {
+    const sc = statusClass(p);
+    const checked = p.lastChecked ? new Date(p.lastChecked).toLocaleString() : 'Never';
+    return `
+    <div class="card ${sc}">
+      <div class="card-header">
+        <div class="card-name">${esc(p.name)}</div>
+        <span class="badge ${sc}">${badgeLabel(sc)}</span>
+      </div>
+      <div class="card-meta">
+        ${p.installed ? `<div><strong>Installed:</strong> ${esc(p.installed)}</div>` : ''}
+        ${p.latestVersion ? `<div><strong>Latest:</strong> ${esc(p.latestVersion)}</div>` : ''}
+        ${p.releaseDate ? `<div><strong>Released:</strong> ${esc(p.releaseDate)}</div>` : ''}
+        <div><strong>Changelog:</strong> <a href="${esc(p.url)}" target="_blank" rel="noopener">View release notes ↗</a></div>
+      </div>
+      <div class="card-actions">
+        ${p.loading ? `<span><span class="spinner"></span> Checking...</span>` : `<button class="refresh-btn" onclick="refreshOne(${p.id})">↻ Check Now</button>`}
+        <button class="edit-btn" onclick="openEditModal(${p.id})">✏ Edit</button>
+        <button class="del-btn" onclick="deleteProgram(${p.id})">✕ Remove</button>
+      </div>
+      <div class="last-checked">Last checked: ${checked}</div>
+    </div>`;
+  }).join('');
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// Close modal on overlay click
+document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+
+load();
+render();
+</script>
+</body>
+</html>
