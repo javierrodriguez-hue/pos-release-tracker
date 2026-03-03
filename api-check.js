@@ -38,7 +38,6 @@ export default async function handler(req, res) {
       .replace(/\s+/g, ' ')
       .trim();
 
-    // djb2 hash
     let hash = 5381;
     for (let i = 0; i < cleaned.length; i++) {
       hash = ((hash << 5) + hash) ^ cleaned.charCodeAt(i);
