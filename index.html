@@ -15,7 +15,19 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
   header h1 { font-size: 1.3rem; font-weight: 600; letter-spacing: 0.5px; }
-  header span { font-size: 0.8rem; color: #8892b0; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .header-right span { font-size: 0.8rem; color: #8892b0; }
+
+  .save-btn {
+    background: #16a34a; color: white; border: none;
+    padding: 7px 16px; border-radius: 6px; cursor: pointer;
+    font-size: 0.85rem; font-weight: 600; transition: background 0.2s;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .save-btn:hover { background: #15803d; }
+  .save-btn:disabled { background: #4b5563; cursor: not-allowed; }
+  .save-btn.unsaved { background: #d97706; }
+  .save-btn.unsaved:hover { background: #b45309; }
 
   .container { max-width: 1100px; margin: 32px auto; padding: 0 20px; }
   .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
@@ -43,27 +55,17 @@
   .card.critical { border-left-color: #dc2626; }
   .card.unknown { border-left-color: #6b7280; }
 
-  /* Editable field rows */
   .field-row { margin-bottom: 12px; }
   .field-label { font-size: 0.72rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
-
-  .field-view {
-    display: flex; align-items: center; gap: 6px;
-    font-size: 0.88rem; color: #334155;
-    padding: 5px 7px; border-radius: 5px;
-    border: 1px dashed transparent; cursor: pointer;
-    transition: border-color 0.15s, background 0.15s; min-height: 32px;
-  }
+  .field-view { display: flex; align-items: center; gap: 6px; font-size: 0.88rem; color: #334155; padding: 5px 7px; border-radius: 5px; border: 1px dashed transparent; cursor: pointer; transition: border-color 0.15s, background 0.15s; min-height: 32px; }
   .field-view:hover { border-color: #cbd5e1; background: #f8fafc; }
   .field-view.empty-val { color: #94a3b8; font-style: italic; }
   .field-view .pencil { font-size: 0.7rem; color: #cbd5e1; margin-left: auto; flex-shrink: 0; }
   .field-view a { color: #2563eb; text-decoration: none; }
   .field-view a:hover { text-decoration: underline; }
-
   .field-input { width: 100%; padding: 5px 8px; border: 1px solid #2563eb; border-radius: 5px; font-size: 0.88rem; font-family: inherit; color: #1a1a2e; outline: none; }
   .field-input:focus { box-shadow: 0 0 0 2px #bfdbfe; }
 
-  /* Status row */
   .status-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
   .card-name-view { font-size: 1.05rem; font-weight: 700; cursor: pointer; padding: 3px 6px; border-radius: 4px; border: 1px dashed transparent; }
   .card-name-view:hover { border-color: #cbd5e1; background: #f8fafc; }
@@ -82,7 +84,10 @@
   .icon-btn.danger:hover { background: #fef2f2; border-color: #fecaca; }
   .last-checked { font-size: 0.75rem; color: #94a3b8; }
 
-  /* Add modal */
+  .alert { font-size: 0.78rem; padding: 5px 10px; border-radius: 5px; margin-bottom: 10px; }
+  .alert.warn { color: #b45309; background: #fef3c7; }
+  .alert.err { color: #dc2626; background: #fef2f2; }
+
   .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
   .modal-overlay.active { display: flex; }
   .modal { background: white; border-radius: 10px; padding: 28px; width: 460px; max-width: 95vw; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
@@ -93,40 +98,55 @@
   .mfield input:focus { border-color: #2563eb; }
   .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 8px; }
 
+  .loading-screen { text-align: center; padding: 80px 20px; color: #94a3b8; }
+  .loading-screen p { margin-top: 12px; font-size: 0.95rem; }
   .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
   .edit-hint { font-size: 0.75rem; color: #94a3b8; margin-bottom: 20px; text-align: right; }
 
   .spinner { display: inline-block; width: 12px; height: 12px; border: 2px solid #e2e8f0; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 4px; vertical-align: middle; }
+  .spinner.lg { width: 28px; height: 28px; border-width: 3px; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: #1a1a2e; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.88rem; box-shadow: 0 4px 20px rgba(0,0,0,0.3); opacity: 0; transition: opacity 0.3s; z-index: 999; }
+  .toast.show { opacity: 1; }
+  .toast.success { background: #15803d; }
+  .toast.error { background: #b91c1c; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>🖥️ POS Release Tracker</h1>
-  <span id="last-refresh">Never refreshed</span>
+  <div class="header-right">
+    <span id="last-refresh">Never refreshed</span>
+    <button class="save-btn" id="save-btn" onclick="saveToKV()">💾 Save Changes</button>
+  </div>
 </header>
 
 <div class="container">
-  <div class="summary-bar" id="summary-bar"></div>
-
-  <div class="top-bar">
-    <h2 id="program-count">0 programs tracked</h2>
-    <div style="display:flex;gap:10px;">
-      <button class="btn secondary" onclick="refreshAll()">↻ Check All URLs</button>
-      <button class="btn" onclick="openAddModal()">+ Add Program</button>
-    </div>
+  <div id="loading-screen" class="loading-screen">
+    <span class="spinner lg"></span>
+    <p>Loading programs...</p>
   </div>
 
-  <div class="edit-hint">✎ Click any field on a card to edit it</div>
-  <div class="grid" id="grid"></div>
-  <div class="empty-state" id="empty" style="display:none;">
-    <p style="margin-bottom:16px;">No programs tracked yet.</p>
-    <button class="btn" onclick="openAddModal()">+ Add your first program</button>
+  <div id="app" style="display:none;">
+    <div class="summary-bar" id="summary-bar"></div>
+    <div class="top-bar">
+      <h2 id="program-count">0 programs tracked</h2>
+      <div style="display:flex;gap:10px;">
+        <button class="btn secondary" onclick="refreshAll()">↻ Check All</button>
+        <button class="btn" onclick="openAddModal()">+ Add Program</button>
+      </div>
+    </div>
+    <div class="edit-hint">✎ Click any field to edit · Click status badge to cycle · 💾 Save to persist across devices</div>
+    <div class="grid" id="grid"></div>
+    <div class="empty-state" id="empty" style="display:none;">
+      <p style="margin-bottom:16px;">No programs tracked yet.</p>
+      <button class="btn" onclick="openAddModal()">+ Add your first program</button>
+    </div>
   </div>
 </div>
 
-<!-- Add Modal -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <h3>Add POS Program</h3>
@@ -145,89 +165,166 @@
   </div>
 </div>
 
+<div class="toast" id="toast"></div>
+
 <script>
-const KEY = 'pos_tracker_v3';
 let programs = [];
-let activeEdit = null; // { id, field, inputEl }
+let unsaved = false;
+let activeEdit = null;
 
-function load() {
-  try { programs = JSON.parse(localStorage.getItem(KEY)) || []; } catch { programs = []; }
-  if (!programs.length) {
-    programs = [{ id: Date.now(), name: 'Tekmetric', url: 'https://support.tekmetric.com/hc/en-us/articles/360041785434-Release-Date-Feature-Notes', status: 'unknown', updateDate: '', featureLink: '', notes: '', lastChecked: null, loading: false }];
-    save();
-  }
+function toast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  setTimeout(() => el.className = 'toast', 3000);
 }
-function save() { localStorage.setItem(KEY, JSON.stringify(programs)); }
 
-// ── Inline editing ──────────────────────────────────────────────────────
+function markUnsaved() {
+  unsaved = true;
+  const btn = document.getElementById('save-btn');
+  btn.textContent = '💾 Save Changes';
+  btn.classList.add('unsaved');
+}
+function markSaved() {
+  unsaved = false;
+  const btn = document.getElementById('save-btn');
+  btn.textContent = '✓ Saved';
+  btn.classList.remove('unsaved');
+  setTimeout(() => { btn.textContent = '💾 Save Changes'; }, 2000);
+}
+
+async function loadFromKV() {
+  try {
+    const res = await fetch('/api/programs');
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch { throw new Error('Bad response from server'); }
+    if (data.programs && data.programs.length > 0) {
+      programs = data.programs;
+    } else {
+      programs = [{
+        id: Date.now(), name: 'Tekmetric',
+        url: 'https://support.tekmetric.com/hc/en-us/articles/360041785434-Release-Date-Feature-Notes',
+        status: 'unknown', updateDate: '', featureLink: '', notes: '',
+        lastChecked: null, lastHash: null, pageChanged: false, loading: false
+      }];
+      await saveToKV(true);
+    }
+  } catch (err) {
+    toast('Could not load from server: ' + err.message, 'error');
+    programs = [];
+  }
+  document.getElementById('loading-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  render();
+}
+
+async function saveToKV(silent = false) {
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.textContent = '💾 Saving...';
+  try {
+    const res = await fetch('/api/programs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ programs })
+    });
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch { throw new Error('Bad response from server'); }
+    if (data.ok) { markSaved(); if (!silent) toast('Programs saved!', 'success'); }
+    else throw new Error(data.error || 'Save failed');
+  } catch (err) {
+    if (!silent) toast('Save failed: ' + err.message, 'error');
+    const btn2 = document.getElementById('save-btn');
+    btn2.textContent = '💾 Save Changes';
+    btn2.classList.add('unsaved');
+  }
+  btn.disabled = false;
+}
+
 function startEdit(id, field, viewEl) {
   if (activeEdit) commitEdit();
   const p = programs.find(x => x.id === id);
   if (!p) return;
-
   const isUrl = field === 'url' || field === 'featureLink';
   const inp = document.createElement('input');
   inp.type = isUrl ? 'url' : 'text';
   inp.className = field === 'name' ? 'card-name-input' : 'field-input';
   inp.value = p[field] || '';
-  inp.placeholder = {
-    name: 'Program name',
-    url: 'https://...',
-    updateDate: 'e.g. Feb 18, 2025',
-    featureLink: 'https://...',
-    notes: 'Brief description of changes...'
-  }[field] || '';
-
+  inp.placeholder = { name: 'Program name', url: 'https://...', updateDate: 'e.g. Feb 18, 2025', featureLink: 'https://...', notes: 'Brief description...' }[field] || '';
   activeEdit = { id, field, viewEl, inp };
   viewEl.replaceWith(inp);
   inp.focus(); inp.select();
   inp.addEventListener('blur', commitEdit);
   inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); commitEdit(); } if (e.key === 'Escape') cancelEdit(); });
 }
-
 function commitEdit() {
   if (!activeEdit) return;
   const { id, field, inp } = activeEdit;
   const p = programs.find(x => x.id === id);
-  if (p) { p[field] = inp.value.trim(); save(); }
-  activeEdit = null;
-  render();
+  if (p) { p[field] = inp.value.trim(); markUnsaved(); }
+  activeEdit = null; render();
 }
 function cancelEdit() { activeEdit = null; render(); }
 
-// ── Status cycling ──────────────────────────────────────────────────────
 function cycleStatus(id) {
-  const p = programs.find(x => x.id === id);
-  if (!p) return;
+  const p = programs.find(x => x.id === id); if (!p) return;
   const order = ['unknown','up-to-date','update-available','critical'];
   p.status = order[(order.indexOf(p.status || 'unknown') + 1) % order.length];
-  save(); render();
+  markUnsaved(); render();
 }
 
-// ── Modal ───────────────────────────────────────────────────────────────
 function openAddModal() { document.getElementById('f-name').value = ''; document.getElementById('f-url').value = ''; document.getElementById('modal').classList.add('active'); }
 function closeModal() { document.getElementById('modal').classList.remove('active'); }
 function saveProgram() {
   const name = document.getElementById('f-name').value.trim();
   const url = document.getElementById('f-url').value.trim();
   if (!name || !url) { alert('Please enter a name and URL.'); return; }
-  programs.push({ id: Date.now(), name, url, status: 'unknown', updateDate: '', featureLink: '', notes: '', lastChecked: null, loading: false });
-  save(); closeModal(); render();
+  programs.push({ id: Date.now(), name, url, status: 'unknown', updateDate: '', featureLink: '', notes: '', lastChecked: null, lastHash: null, pageChanged: false, loading: false });
+  markUnsaved(); closeModal(); render();
 }
 function deleteProgram(id) {
   if (!confirm('Remove this program?')) return;
-  programs = programs.filter(x => x.id !== id); save(); render();
+  programs = programs.filter(x => x.id !== id); markUnsaved(); render();
 }
 
-// ── URL check ───────────────────────────────────────────────────────────
 async function fetchInfo(p) {
   p.lastChecked = new Date().toISOString();
-  try { await fetch(p.url, { method: 'HEAD', mode: 'no-cors' }); p.reachable = true; } catch { p.reachable = false; }
-  save();
+  try {
+    const res = await fetch('/api/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: p.url })
+    });
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); } catch { throw new Error('Unexpected response from server'); }
+    if (data.hash) {
+      if (p.lastHash && p.lastHash !== data.hash) {
+        p.status = p.status === 'critical' ? 'critical' : 'update-available';
+        p.pageChanged = true;
+      } else {
+        p.pageChanged = false;
+      }
+      p.lastHash = data.hash;
+      p.reachable = true;
+      p.fetchError = null;
+    } else {
+      p.reachable = false;
+      p.fetchError = data.error || 'Could not reach page';
+    }
+  } catch (err) {
+    p.reachable = false;
+    p.fetchError = err.message;
+  }
+  markUnsaved();
 }
 async function refreshOne(id) {
   const p = programs.find(x => x.id === id); if (!p) return;
-  p.loading = true; render(); await fetchInfo(p); p.loading = false; render();
+  p.loading = true; render();
+  await fetchInfo(p);
+  p.loading = false; render();
 }
 async function refreshAll() {
   programs.forEach(p => p.loading = true); render();
@@ -237,21 +334,19 @@ async function refreshAll() {
   render();
 }
 
-// ── Helpers ─────────────────────────────────────────────────────────────
 const badgeLabel = s => ({ 'up-to-date':'Up to Date','update-available':'Update Available','critical':'Critical','unknown':'Unknown' }[s] || 'Unknown');
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 
 function fieldView(id, field, value, placeholder, isUrl = false) {
   const isEmpty = !value;
   const display = isEmpty
-    ? `<span class="empty-val">${placeholder}</span><span class="pencil">✎</span>`
+    ? `<span>${placeholder}</span><span class="pencil">✎</span>`
     : isUrl
       ? `<a href="${esc(value)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">${field === 'url' ? 'View changelog ↗' : 'View feature ↗'}</a><span class="pencil">✎</span>`
       : `<span>${esc(value)}</span><span class="pencil">✎</span>`;
   return `<div class="field-view ${isEmpty ? 'empty-val' : ''}" onclick="startEdit(${id},'${field}',this)">${display}</div>`;
 }
 
-// ── Render ───────────────────────────────────────────────────────────────
 function render() {
   const grid = document.getElementById('grid');
   const empty = document.getElementById('empty');
@@ -274,30 +369,30 @@ function render() {
     return `
     <div class="card ${sc}">
       <div class="status-row">
-        <div class="card-name-view" onclick="startEdit(${p.id},'name',this)" title="Click to edit name">${esc(p.name)} <span style="font-size:0.7rem;color:#cbd5e1">✎</span></div>
-        <button class="badge ${sc}" onclick="cycleStatus(${p.id})" title="Click to change status">${badgeLabel(sc)}</button>
+        <div class="card-name-view" onclick="startEdit(${p.id},'name',this)">${esc(p.name)} <span style="font-size:0.7rem;color:#cbd5e1">✎</span></div>
+        <button class="badge ${sc}" onclick="cycleStatus(${p.id})" title="Click to cycle status">${badgeLabel(sc)}</button>
       </div>
-
       <div class="field-row">
         <div class="field-label">Changelog URL</div>
-        ${fieldView(p.id, 'url', p.url, 'Click to add URL', true)}
+        ${fieldView(p.id,'url',p.url,'Click to add URL',true)}
       </div>
       <div class="field-row">
         <div class="field-label">Most Recent Update Date</div>
-        ${fieldView(p.id, 'updateDate', p.updateDate, 'Click to add date')}
+        ${fieldView(p.id,'updateDate',p.updateDate,'Click to add date')}
       </div>
       <div class="field-row">
         <div class="field-label">Feature Link</div>
-        ${fieldView(p.id, 'featureLink', p.featureLink, 'Click to add feature link', true)}
+        ${fieldView(p.id,'featureLink',p.featureLink,'Click to add feature link',true)}
       </div>
       <div class="field-row">
         <div class="field-label">Notes</div>
-        ${fieldView(p.id, 'notes', p.notes, 'Click to add notes')}
+        ${fieldView(p.id,'notes',p.notes,'Click to add notes')}
       </div>
-
+      ${p.pageChanged ? `<div class="alert warn">⚠️ Page content changed since last check</div>` : ''}
+      ${p.fetchError ? `<div class="alert err">⚠️ ${esc(p.fetchError)}</div>` : ''}
       <div class="card-footer">
         <div style="display:flex;gap:6px;">
-          ${p.loading ? `<span><span class="spinner"></span>Checking...</span>` : `<button class="icon-btn" onclick="refreshOne(${p.id})">↻ Check URL</button>`}
+          ${p.loading ? `<span><span class="spinner"></span>Checking...</span>` : `<button class="icon-btn" onclick="refreshOne(${p.id})">↻ Check Now</button>`}
           <button class="icon-btn danger" onclick="deleteProgram(${p.id})">✕ Remove</button>
         </div>
         <div class="last-checked">Checked: ${checked}</div>
@@ -307,7 +402,7 @@ function render() {
 }
 
 document.getElementById('modal').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
-load(); render();
+loadFromKV();
 </script>
 </body>
 </html>
