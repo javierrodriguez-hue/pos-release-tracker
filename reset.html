@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Reset POS Tracker Data</title>
+<style>
+  body { font-family: 'Segoe UI', sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f0f2f5; }
+  .box { background: white; border-radius: 12px; padding: 40px; max-width: 420px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+  h2 { color: #1a1a2e; margin-bottom: 12px; }
+  p { color: #64748b; font-size: 0.9rem; margin-bottom: 24px; line-height: 1.6; }
+  button { background: #dc2626; color: white; border: none; padding: 12px 28px; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 600; }
+  button:hover { background: #b91c1c; }
+  button:disabled { background: #9ca3af; cursor: not-allowed; }
+  .status { margin-top: 20px; font-size: 0.88rem; color: #64748b; min-height: 24px; }
+  .success { color: #16a34a; font-weight: 600; }
+  .error { color: #dc2626; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h2>🗑️ Reset Tracker Data</h2>
+  <p>This will clear all 271 duplicate programs and reset to a single clean Tekmetric entry. Only use this once then delete this file from GitHub.</p>
+  <button onclick="reset()" id="btn">Reset Now</button>
+  <div class="status" id="status"></div>
+</div>
+<script>
+async function reset() {
+  const btn = document.getElementById('btn');
+  const status = document.getElementById('status');
+  btn.disabled = true;
+  btn.textContent = 'Resetting...';
+  status.textContent = 'Sending reset to server...';
+
+  const clean = [{
+    id: Date.now(),
+    name: 'Tekmetric',
+    url: 'https://support.tekmetric.com/hc/en-us/articles/360041785434-Release-Date-Feature-Notes',
+    status: 'unknown',
+    updateDate: '',
+    featureLink: '',
+    notes: '',
+    lastChecked: null,
+    lastHash: null,
+    pageChanged: false,
+    loading: false
+  }];
+
+  try {
+    const res = await fetch('/api/programs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ programs: clean })
+    });
+    const text = await res.text();
+    const data = JSON.parse(text);
+    if (data.ok) {
+      status.innerHTML = '<span class="success">✓ Reset complete! Go back to your app and refresh.</span>';
+      btn.textContent = 'Done';
+    } else {
+      throw new Error(data.error || 'Unknown error');
+    }
+  } catch (err) {
+    status.innerHTML = `<span class="error">Error: ${err.message}</span>`;
+    btn.disabled = false;
+    btn.textContent = 'Try Again';
+  }
+}
+</script>
+</body>
+</html>
