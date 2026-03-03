@@ -198,7 +198,7 @@ async function loadFromKV() {
     const res = await fetch('/api/programs');
     const text = await res.text();
     let data;
-    try { data = JSON.parse(text); } catch { throw new Error('Bad response from server'); }
+    try { data = JSON.parse(text); } catch { throw new Error('Bad response from server1'); }
     if (data.programs && data.programs.length > 0) {
       programs = data.programs;
     } else {
@@ -231,7 +231,7 @@ async function saveToKV(silent = false) {
     });
     const text = await res.text();
     let data;
-    try { data = JSON.parse(text); } catch { throw new Error('Bad response from server'); }
+    try { data = JSON.parse(text); } catch { throw new Error('Bad response from server2'); }
     if (data.ok) { markSaved(); if (!silent) toast('Programs saved!', 'success'); }
     else throw new Error(data.error || 'Save failed');
   } catch (err) {
@@ -299,7 +299,7 @@ async function fetchInfo(p) {
     });
     const text = await res.text();
     let data;
-    try { data = JSON.parse(text); } catch { throw new Error('Unexpected response from server'); }
+    try { data = JSON.parse(text); } catch { throw new Error('Unexpected response from server3'); }
     if (data.hash) {
       if (p.lastHash && p.lastHash !== data.hash) {
         p.status = p.status === 'critical' ? 'critical' : 'update-available';
