@@ -1,0 +1,17 @@
+{
+  "functions": {
+    "api/check.js": {
+      "memory": 256,
+      "maxDuration": 15
+    },
+    "api/programs.js": {
+      "memory": 256,
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    { "source": "/api/check", "destination": "/api/check" },
+    { "source": "/api/programs", "destination": "/api/programs" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
