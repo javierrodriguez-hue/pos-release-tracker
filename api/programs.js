@@ -1,20 +1,44 @@
 const KV_KEY = 'pos_programs';
 
-async function kvGet(url, token) {
-  const res = await fetch(`${url}/get/${KV_KEY}`, {
+async function kvGet(baseUrl, token) {
+  const res = await fetch(`${baseUrl}/get/${KV_KEY}`, {
     headers: { Authorization: `Bearer ${token}` }
   });
+  if (!res.ok) throw new Error(`Upstash GET failed: ${res.status}`);
   const data = await res.json();
-  return data.result ? JSON.parse(data.result) : null;
+  if (!data.result) return null;
+  return typeof data.result === 'string' ? JSON.parse(data.result) : data.result;
 }
 
-async function kvSet(url, token, value) {
-  const res = await fetch(`${url}/set/${KV_KEY}`, {
+async function kvSet(baseUrl, token, value) {
+  const res = await fetch(`${baseUrl}/set/${KV_KEY}`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
     body: JSON.stringify(value)
   });
-  return res.ok;
+  if (!res.ok) {
+    const txt = await res.text();
+    throw new Error(`Upstash SET failed (${res.status}): ${txt}`);
+  }
+  const data = await res.json();
+  return data.result === 'OK';
+}
+
+// Manually parse body in case Vercel doesn't auto-parse
+async function parseBody(req) {
+  if (req.body && typeof req.body === 'object') return req.body;
+  return new Promise((resolve, reject) => {
+    let raw = '';
+    req.on('data', chunk => raw += chunk);
+    req.on('end', () => {
+      try { resolve(JSON.parse(raw)); }
+      catch { reject(new Error('Failed to parse request body')); }
+    });
+    req.on('error', reject);
+  });
 }
 
 export default async function handler(req, res) {
@@ -23,30 +47,31 @@ export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const baseUrl = (process.env.UPSTASH_REDIS_REST_URL || '').replace(/\/+$/, '').replace(/^"|"$/g, '');
+  const token = (process.env.UPSTASH_REDIS_REST_TOKEN || '').replace(/^"|"$/g, '');
 
-  if (!url || !token) {
+  if (!baseUrl || !token) {
     return res.status(500).json({ error: 'Upstash credentials not configured' });
   }
 
-  // GET — load programs
   if (req.method === 'GET') {
     try {
-      const programs = await kvGet(url, token);
+      const programs = await kvGet(baseUrl, token);
       return res.status(200).json({ programs: programs || [] });
     } catch (err) {
       return res.status(500).json({ error: err.message });
     }
   }
 
-  // POST — save programs
   if (req.method === 'POST') {
     try {
-      const { programs } = req.body;
-      if (!Array.isArray(programs)) return res.status(400).json({ error: 'Invalid data' });
-      const ok = await kvSet(url, token, JSON.stringify(programs));
-      if (!ok) throw new Error('Upstash write failed');
+      const body = await parseBody(req);
+      const { programs } = body;
+      if (!Array.isArray(programs)) {
+        return res.status(400).json({ error: `Invalid data — got ${typeof programs}` });
+      }
+      const ok = await kvSet(baseUrl, token, programs);
+      if (!ok) throw new Error('Upstash returned non-OK result');
       return res.status(200).json({ ok: true, count: programs.length });
     } catch (err) {
       return res.status(500).json({ error: err.message });
